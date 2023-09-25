@@ -1,4 +1,5 @@
 const BAD_REQUEST = "Некорректные данные.";
+const BAD_REQUEST_ROLE = "Возможна только роль USER.";
 const CONFLICT = "Конфликт данных.";
 const CONFLICT_EMAIL = "E-mail уже используется.";
 const FORBIDDEN = "Отказано в доступе.";
@@ -19,6 +20,7 @@ const errorMessages = {
   CONFLICT_EMAIL,
   UNAUTHORIZED_LOGIN,
   SUCCESS,
+  BAD_REQUEST_ROLE,
 };
 
 module.exports = errorMessages;

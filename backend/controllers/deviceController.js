@@ -156,6 +156,63 @@ class DeviceController {
       return next(new InternalServerError());
     }
   }
+  async updateById(req, res, next) {
+    try {
+      const id = Number(req.params.id);
+
+      if (!id) {
+        return next(new BadRequestError());
+      }
+
+      let { name, price, brandId, typeId, info } = req.body;
+
+      const image = req.files?.image || null;
+
+      if (!name || !price || !brandId || !typeId || !image) {
+        throw new BadRequestError();
+      }
+
+      let fileName = uuid.v4() + ".jpg";
+
+      const device = await Device.create({
+        name,
+        price,
+        brandId,
+        typeId,
+        image: fileName,
+      }).catch((e) => {
+        if (e.name === "SequelizeUniqueConstraintError") {
+          throw new ConflictError();
+        }
+
+        throw new InternalServerError();
+      });
+
+      if (info) {
+        info = JSON.parse(info);
+
+        info.forEach((item) => {
+          DeviceInfo.create({
+            title: item.title,
+            description: item.description,
+            deviceId: device.id,
+          }).catch((e) => {
+            if (e.name === "SequelizeUniqueConstraintError") {
+              throw new ConflictError();
+            }
+
+            throw new InternalServerError();
+          });
+        });
+      }
+
+      image.mv(path.resolve(__dirname, "..", "static", fileName));
+
+      return res.status(STATUS_CODE_OK).json(device);
+    } catch (e) {
+      return next(e);
+    }
+  }
 }
 
 module.exports = new DeviceController();

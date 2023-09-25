@@ -1,12 +1,16 @@
 const Router = require("express").Router;
 const deviceController = require("../controllers/deviceController");
 const checkRole = require("../midllewares/checkRole");
+const auth = require("../midllewares/auth");
 
 const router = new Router();
 
-router.post("/", checkRole("ADMIN"), deviceController.create);
+const { ADMIN } = require("../utils/constants");
+
 router.get("/", deviceController.getAll);
 router.get("/:id", deviceController.getOneByID);
-router.delete("/:id", checkRole("ADMIN"), deviceController.deleteById);
+
+router.post("/", auth, checkRole(ADMIN), deviceController.create);
+router.delete("/:id", auth, checkRole(ADMIN), deviceController.deleteById);
 
 module.exports = router;
